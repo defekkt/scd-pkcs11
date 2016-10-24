@@ -134,7 +134,10 @@ gpg_error_t scd_agent_connect(assuan_context_t *ctx)
 	if (*ctx != NULL) { return 0; }
 
 	err = find_gpg_socket(gpg_agent_socket_name, 1024);
-	if (err) { return err; }
+	if (err) { 
+		SDEBUG("Could not find agent path, check env. variables");
+		return err; 
+	}
 
 	err = assuan_new(ctx);
 	if (err) { return err; }
@@ -143,6 +146,7 @@ gpg_error_t scd_agent_connect(assuan_context_t *ctx)
 	if (err) {
 		assuan_release(*ctx);
 		*ctx = NULL;
+		SDEBUG("Could not connect to agent via socket: '%s'", gpg_agent_socket_name);
 		return err;
 	}
 
