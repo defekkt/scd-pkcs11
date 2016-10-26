@@ -44,12 +44,15 @@ static gpg_error_t find_gpg_socket(char *buf, size_t len)
 	char *tmp, *t, *ext = NULL;
 	tmp = getenv("SSH_AUTH_SOCK");
 	if (tmp) {
-		ext = "/S.gpg-agent.ssh";
-		if (strlen(tmp) + strlen(ext) + 1 > len)
-			return 1;
-		t = stpcpy(buf, tmp);
-		stpcpy(t, ext);
-		return 0;
+		ext = ".ssh";
+		if (strlen(tmp) + sizeof(char) > len){
+			return 1;}
+		strncpy(buf, tmp, len);
+		t = strstr(buf, ext);
+		if (t != NULL){
+			*t = '\0';
+			return 0;
+		}
 	}
 	tmp = getenv("GPG_AGENT_INFO");
 	if (tmp) {
